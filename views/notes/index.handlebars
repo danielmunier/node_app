@@ -1,0 +1,38 @@
+<h2>Tarefas</h2>
+<hr>
+{{#each notes}}
+<div class="container">
+<div class="card mt-4" style="width: 18rem">
+    <div class="card-body">
+        <h4>{{title}}</h4>
+        <small>{{description}}</small>
+        <br>
+        <small>{{date}}</small>
+        <br>
+
+        <a href="/notes/edit/{{_id}}">
+            <button class="btn btn-success mt-2">Editar</button>
+        </a>
+
+        <a href="/notes/delete/{{_id}}">
+            <button class="btn btn-danger mt-2">Excluir</button>
+        </a>
+
+    </div>
+</div>
+</div>
+{{else}}
+
+<p>Nenhuma tarefa disponível</p>
+
+{{/each}}
+
+<div class="buttons ">
+    <a href="/notes/add">
+        <button class="btn btn-success mt-4">Adicionar item</button>
+    </a>
+    <a href="/notes/delete_all">
+        <button class="btn btn-danger mt-4">Excluir tudo</button>
+    </a>
+</div>
+

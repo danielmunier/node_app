@@ -1,16 +1,23 @@
-const db  = require("./db")
+const mongoose = require("mongoose")
+const Schema = mongoose.Schema
 
-
-const User = db.sequelize.define("users", {
+const Users = new Schema({
+    nickname: {
+        type: String,
+        required: true
+    },
     email: {
-        type: db.Sequelize.STRING(60)
+        type: String,
+        required: true
     },
     password: {
-        type: db.Sequelize.CHAR(60)
-    }
+        type: String,
+        required: true
+    },
+    admin: {
+        type: Number,
+        default: 0
+    },
 })
 
-
-/* User.sync({force: true}); ATENÇÃO: EXECUTAR APENAS UMA VEZ PARA CRIAR A TABELA "User" */ 
-
-module.exports = User
+mongoose.model("users", Users)

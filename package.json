@@ -1,23 +1,25 @@
 {
-  "name": "nodezinho",
+  "name": "node_app",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js",
-    "dev": "nodemon app.js"
+    "nodemon": "nodemon app.js"
   },
-  "author": "Daniel Munier",
+  "keywords": [],
+  "author": "",
   "license": "ISC",
   "dependencies": {
-    "dotenv": "^16.0.1",
+    "bcryptjs": "^2.4.3",
+    "connect-flash": "^0.1.1",
     "express": "^4.18.1",
     "express-handlebars": "^6.0.6",
-    "mysql2": "^2.3.3",
-    "sequelize": "^6.19.2"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.16"
+    "express-session": "^1.17.3",
+    "mongoose": "^6.3.5",
+    "nodemon": "^2.0.18",
+    "passport": "^0.6.0",
+    "passport-google-oauth": "^2.0.0",
+    "passport-local": "^1.0.0"
   }
 }

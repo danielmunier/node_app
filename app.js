@@ -1,87 +1,78 @@
-const express = require("express");
-const handlebars = require('express-handlebars')
-const Sequelize = require("sequelize");
-const res = require("express/lib/response");
-const User = require("./models/User");
-const app = express();
+const express = require("express")
+const { engine } = require("express-handlebars")
+const mongoose = require("mongoose")
+const path = require("path")
+const session = require("express-session")
+const flash = require("connect-flash")
+const notes = require("./routes/note")
+const app = express()
+const bcrypt = require('bcryptjs')
+const passport = require("passport")
+const users = require("./routes/user")
 
-const {
-    randomUUID
-} = require("crypto")
+require("./config/auth")(passport)
 
-const {
-    format
-} = require("path");
-
-const {
-    brotliDecompressSync
-} = require("zlib");
-
-
-
-app.use(express.json())
+console.log("teste")
 // Config
-    // Template Engine
-    app.engine("handlebars", handlebars.engine({
-        defaultLayout: 'main',
-    
-    }))
-    app.set("view engine", "handlebars")
-
-    // Body Express Parser
-    app.use(express.urlencoded({
-        extended: false
-    }))
+    app.use(express.static("public"))
+    app.use(express.urlencoded({ extended: true }))
     app.use(express.json())
-  
-
-
-
-app.get("/", function(request, response){
-    User.findAll({order: [["id", "DESC"]]}).then(function(users){ // Recebe o array do banco de dados 
-        response.render("home", {users: users})
-    })
     
-})
+    app.use(session({
+        secret: "anything",
+        resave: true,
+        saveUninitialized: true
+    }))
 
+    app.use(passport.initialize())
+    app.use(passport.session())
 
-  
+    app.use(flash())
+    
+    // Template Engine Handlebars
+        app.set("view engine", "handlebars")
+        app.engine("handlebars", engine({defaultLayout: "main",
+        runtimeOptions: {
+            allowProtoPropertiesByDefault: true,
+            allowProtoMethodsByDefault: true
+          }})) // Usa o handlebars com o template engine
 
-app.get("/cadastro", function(request, response) {
-    response.render("form")
-})
+    // Middleware
+    app.use((req, res, next) => {
+        res.locals.success_msg  = req.flash("success_msg")
+        res.locals.error_msg = req.flash("error_msg")
+        res.locals.error = req.flash("error")
+        res.locals.user = req.user || null // O req.user é o usuário logado do passport
 
-app.post("/cadastrado", function(request, response) { // Rota POST recebe dados do formulário
-    console.log("Iniciando o envio para o banco de dados...")
-    User.create({
-        email: request.body.email,
-        password: request.body.password
-    }).then(function(){
-        console.log("Conectado com sucesso!")
-        response.redirect("/")
-    }).catch(function(error){
-        console.log("Falha na conexão")
-        console.log(error)
+        next()
+
     })
-})
 
-app.get("/delete/:id", function(request, response){
-    User.destroy({where: {'id': request.params.id}}).then(function(){
-        console.log("Deletado com sucesso " + request.params.id)
-        response.redirect('/')
-    }).catch(function(error){
-        console.log("Postagem inexistente: " + error)
+
+
+// Mongoose
+    mongoose.Promise = global.Promise
+    mongoose.connect("mongodb://localhost/missions").then(() => {
+        console.log("Conectado ao MongoDB")
+    }).catch(err => {
+        console.log("Erro ao se conectar ao MongoDB: " + err)
     })
+
+// Public
+    app.use(express.static(path.join(__dirname, "public"))) // pega o diretório para a pasta "public"
+
+
+
+// Routes
+    app.get('/', (req, res) => {
+        res.redirect("/notes")
+       /*  res.render("home/principal") */
+    })
+
+    app.use("/notes", notes)
+    app.use("/user", users)
+
+const port = 5000
+app.listen(port, () => {
+    console.log(`http://127.0.0.1:${port}`)
 })
-
-
-
-app.listen(3333, () => {
-    console.clear()
-    console.log(`Servidor rodando em http://localhost:3333`)
-})
-
-/* Body => Sempre que quiser enviar dados pra aplicação 
-  Params => /products/:id, o id é o parametro obrigatório da rota products
-  Query => /products?id=123&value=1234
-*/
