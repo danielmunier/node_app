@@ -15,36 +15,41 @@ router.get("/login", (req, res) => {
 })
 
 router.post("/register", (req, res) => { //Recebe os dados do front para cadastrar o usuário
-    var errors = []
+    var erros = []
     console.log(req.body)
 
     if (!req.body.nickname || typeof req.body.nickname == undefined || req.body.nickname == null || req.body.nickname == "") {
-        errors.push({
+        console.log("Nickname não preenchido")
+        erros.push({
             text: "Please enter a valid name"
         })
     }
 
     if (!req.body.email || typeof req.body.email == undefined || req.body.email == null || req.body.email == "") {
-        errors.push({
+        console.log("Email não preenchido")
+        erros.push({
             text: "Please enter a valid email"
         })
     }
 
     if (!req.body.password || typeof req.body.password == undefined || req.body.password == null || req.body.password == "") {
-        errors.push({
+        console.log("Password não preenchido")
+        erros.push({
             text: "Please enter a valid password"
         })
     }
 
     if (req.body.password.length < 4) {
-        errors.push({
+        console.log("Password não preenchido")
+        erros.push({
             text: "Password must be at least 4 characters"
         })
     }
 
-    if (errors.length > 0) {
-        res.render("user/register", {
-            errors: errors
+    if (erros.length > 0) {
+        console.log("Há um total de " + erros.length)
+        res.render("users/register", {
+            erros: erros
         })
     } else {
 
@@ -53,8 +58,13 @@ router.post("/register", (req, res) => { //Recebe os dados do front para cadastr
         }).then((user) => {
             if (user) {
                 console.log("Email já registrado")
-                req.flash("error_msg", "Email already registered")
-                res.redirect("/user/register")
+                erros.push({
+                    text: "Email already registered"
+                })
+                res.render("users/register", {
+                    erros: erros
+                })
+
             } else {
                 const newUser = new User({
                     nickname: req.body.nickname,
@@ -78,6 +88,7 @@ router.post("/register", (req, res) => { //Recebe os dados do front para cadastr
                                 res.redirect("/user/login")
                             }).catch((err) => {
                                 req.flash("error_msg", "Error registering user")
+                                
                                 res.redirect("/user/register")
                             })
                         }

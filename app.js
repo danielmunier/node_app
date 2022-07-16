@@ -12,7 +12,6 @@ const users = require("./routes/user")
 
 require("./config/auth")(passport)
 
-console.log("teste")
 // Config
     app.use(express.static("public"))
     app.use(express.urlencoded({ extended: true }))
